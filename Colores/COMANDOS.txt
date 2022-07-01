@@ -1,0 +1,9 @@
+COMANDOS A EJECUTAR AL REALIZAR ESTA PARTE DEL CURSO
+- npm i
+- npm run start
+- truffle compile
+- truffle migrate
+- 
+
+PROBAR LOS TEST
+- truffle test

@@ -1,0 +1,8 @@
+/* Los estilos estaran en esta hoja */
+
+.token{
+    height: 300px;
+    width: 300px;
+    border-radius: 50%;
+    display: inline-block;
+}
