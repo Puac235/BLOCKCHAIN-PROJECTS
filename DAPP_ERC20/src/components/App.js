@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from '../logo.png';
 import './App.css';
 import Web3 from 'web3';
 import web3 from '../ethereum/web3';
@@ -39,7 +38,9 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts();
     this.setState({account: accounts[0]});
 
-    const networkId = '5777';
+    // const networkId = '5777';  // Ganache
+    const networkId = '4';        // Rinkeby
+
     console.log('networkID: ', networkId);
 
     const networkData = contractToken.networks[networkId];
@@ -56,13 +57,95 @@ class App extends Component {
       this.setState({contract});
 
       // TODO: DIRECCION DEL CONTRATO
+      const smartContractAddress = await this.state.contract.methods.getContract().call();
+      this.setState({smartContractAddress});
+      console.log("Direccion del Smart Contract ", smartContractAddress);
 
-
-    }
+    } 
     else{
       alert('El Smart Contract no se ha desplegado en la red!');
     }
 
+  }
+
+  // Funcion para realizar la compra de tokens
+  envio = async(direccion, cantidad, ethers, mensaje) => {
+    try{
+      console.log(mensaje);
+      const accounts = await web3.eth.getAccounts();
+      await this.state.contract.methods.sendTokens(direccion, cantidad).send({from: accounts[0], value: ethers});
+    }
+    catch(error){
+      this.setState({ errorMessage: error.message });
+    }
+    finally {
+      this.setState({ loading: false });
+    }
+  }
+
+  //Funcion para visualizar el balance de tokens de un usuario
+  balanceUser = async(addressBalance, message) => {
+    try{
+      console.log(message);
+      //Balance del usuario
+      const balanceAddress = await this.state.contract.methods.balanceAddress(addressBalance).call();
+      alert(balanceAddress);
+      this.setState({addressBalance: balanceAddress});
+    }
+    catch(error){
+      this.setState({ errorMessage: error.message });
+    }
+    finally {
+      this.setState({ loading: false });
+    }
+  }
+
+  //Funcion para visualizar el balance de tokens del contrato
+  balanceContract = async(message) => {
+    try{
+      console.log(message);
+      //Balance del usuario
+      const balanceContract = await this.state.contract.methods.totalBalance().call();
+      alert(parseFloat(balanceContract));
+      this.setState({contractBalance: balanceContract});
+    }
+    catch(error){
+      this.setState({ errorMessage: error.message });
+    }
+    finally {
+      this.setState({ loading: false });
+    }
+  }
+
+  //Funcion para incrementar el balance de tokens del smart contract
+  incrementTokens = async(numTokens, message) => {
+    try{
+      console.log(message);
+      //Incrementar el balance de tokens del smart contract
+      await this.state.contract.methods.generateTokens(numTokens).send({account: accounts[0]});
+    }
+    catch(error){
+      this.setState({ errorMessage: error.message });
+    }
+    finally {
+      this.setState({ loading: false });
+    }
+  }
+
+  constructor(props){
+    super(props);
+    this.state = {
+      cantidad: 0,
+      account: '',
+      contract: null,
+      smartContractAddress: '',
+      owner: '',
+      address: '',
+      loading: false,
+      errorMessage: '',
+      addressBalance: '',
+      contractBalance: ''
+    };
   }
 
   render() {
@@ -77,30 +160,92 @@ class App extends Component {
           >
             Token ERC20 (PuaCoin) DApp
           </a>
+          <ul className="navbar-nav px-3">
+            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
+              <small className="text-white">
+                <span id="account">{this.state.smartContractAddress}</span>
+              </small>
+            </li>
+          </ul>
         </nav>
         <div className="container-fluid mt-5">
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
               <div className="content mr-auto ml-auto">
-                <a
-                  href="https://frogames.es/rutas-de-aprendizaje"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img src={logo} className="App-logo" alt="logo" />
-                </a>
-                <h1>DApp</h1>
-                <p>
-                  Edita <code>src/components/App.js</code> y guarda para recargar.
-                </p>
-                <a
-                  className="App-link"
-                  href="https://frogames.es/rutas-de-aprendizaje"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                   APRENDE BLOCKCHAIN <u><b>AHORA! </b></u>
-                </a>
+                <h1>Comprar PuaCoins ERC20</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault();
+                  const direccion = this.direccion.value;
+                  const cantidad = this.cantidad.value;
+                  const ethers = web3.utils.toWei(this.cantidad.value, 'ether');
+                  const mensaje = "Compra de tokens en ejecucion...";
+                  this.envio(direccion, cantidad, ethers, mensaje);
+
+                }}>
+                  <input type='text' 
+                    className='form-control mb-1' 
+                    placeholder='Direccion de destino'
+                    ref={(input) => {this.direccion = input;}} />
+                  <input type='text' 
+                    className='form-control mb-1' 
+                    placeholder='Cantidad de PuaCoins a enviar' 
+                    ref={(input) => {this.cantidad = input;}} />  
+                  <input type='submit'
+                    className='btn btn-block btn-primary btn-sm'
+                    value='COMPRAR PUACOINS'/>
+                </form>
+
+                &nbsp;
+
+                <h1>Balance total de Tokens del Usuario</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault();
+                  const address = this.addressBalance.value;
+                  const mensaje = "Balance de tokens de un usuario en ejecucion...";
+                  this.balanceUser(address, mensaje);
+
+                }}>
+                  <input type='text' 
+                    className='form-control mb-1' 
+                    placeholder='Direccion del usuario'
+                    ref={(input) => {this.addressBalance = input;}} />
+                  <input type='submit'
+                    className='btn btn-block btn-danger btn-sm'
+                    value='OBTENER BALANCE DE TOKENS'/>
+                </form>
+                
+                &nbsp;
+                
+                <h1>Balance total de Tokens del Contrato</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault();
+                  const mensaje = "Balance de tokens del contrato en ejecucion...";
+                  this.balanceContract(mensaje);
+                }}>
+                  <input type='submit'
+                    className='btn btn-block btn-success btn-sm'
+                    value='OBTENER BALANCE DE TOKENS DE CONTRATO'/>
+                </form>
+
+                &nbsp;
+                
+                <h1>Añadir Nuevos Tokens</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault();
+                  const numTokens = this.numTokens.value;
+                  const mensaje = "Incremento tokens del Smart Contract en ejecucion...";
+                  this.incrementTokens(numTokens, mensaje);
+
+                }}>
+                  <input type='text' 
+                    className='form-control mb-1' 
+                    placeholder='Número de tokens a incrementar'
+                    ref={(input) => {this.numTokens = input;}} />
+                  <input type='submit'
+                    className='btn btn-block btn-warning btn-sm'
+                    value='INCREMENTAR TOKENS'/>
+                </form>
+
               </div>
             </main>
           </div>
