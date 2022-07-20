@@ -19,10 +19,10 @@ contract('Color', (accounts) =>{
         });
         it('Tiene un nombre', async() => {
             const name = await contract.name();
-            assert.equal(name, 'Color');
+            assert.equal(name, 'color');
         });
         it('Tiene un simbolo', async() => {
-            const symbol = contract.symbol()
+            const symbol = await contract.symbol();
             assert.equal(symbol, 'COLOR');
         });
     });
@@ -35,20 +35,20 @@ contract('Color', (accounts) =>{
             assert.equal(totalSupply, 1);
             const event = result.logs[0].args;
             assert.equal(event.tokenId.toNumber(), 1, 'Correct ID');
-            assert.equal(event.from, '0x0000000000000000000000000000', 'Correct Address');
+            assert.equal(event.from, '0x0000000000000000000000000000000000000000', 'Correct Address');
             assert.equal(event.to, accounts[0], 'Correct Address');
             // No exitoso
             await contract.mint('#EC058E').should.be.rejected;
         });
     });
 
-    describe('indexing', async() => {
+    describe('Indexing', async() => {
         it('Lista de Colores', async() => {
             await contract.mint('#5386E4');
             await contract.mint('#FFFFFF');
             await contract.mint('#000000');
 
-            const totalSupply = contract.totalSupply();
+            const totalSupply = await contract.totalSupply();
             
             let color;
             let result = [];
@@ -58,8 +58,8 @@ contract('Color', (accounts) =>{
                 result.push(color);
             }
 
-            let expected = ['#5386E4', '#FFFFFF', '#000000'];
-            assert.equaL(result.join(',').expected.join(','));
+            let expected = ['#EC058E','#5386E4', '#FFFFFF', '#000000'];
+            assert.equal(result.join(','), expected.join(','));
 
 
         });
