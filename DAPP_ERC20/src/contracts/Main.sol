@@ -34,33 +34,33 @@ contract main {
     // Get price token
     function priceTokens(uint _numTokens) internal pure returns (uint) {
         // Conversion tokens to Ethers: 1 token -> 1 ether
-        return _numTokens * (0.2 ether);
+        return _numTokens * (0.1 ether);
     }
 
     // Compramos tokens mediante direccion de destino y cantidad de tokens
-    function sendTokens(address _destinatario, uint _numtokens) public payable {
-        require(_numtokens < 10, "La cantidad de tokens es demasiado alta.");
+    function sendTokens(address _destinatario, uint _numTokens) public payable {
+        require(_numTokens < 10, "La cantidad de tokens es demasiado alta.");
 
         // get tokens price
         uint cost =  priceTokens(_numTokens);
         // Evaluate the price in ethers to pay
-        require(msg.value >= coste, "Compra menos tokens o paga con más ethers!");
+        require(msg.value >= cost, "Compra menos tokens o paga con más ethers!");
         // User's change
-        uint returnValue = msg.value - coste;
+        uint returnValue = msg.value - cost;
         // return ethers change to user
         msg.sender.transfer(returnValue);
 
         // get balance of tokens free
         uint balance = totalBalance();
 
-        require(_numtokens <= balance, "Compra un numero menor de tokens, tokens insuficientes");
+        require(_numTokens <= balance, "Compra un numero menor de tokens, tokens insuficientes");
 
         // Transferencia de los tokens al destinatario
-        token.transfer(_destinatario, _numtokens);
+        token.transfer(_destinatario, _numTokens);
     }
 
     // Generacion de tokens al contrato
-    function generateTokens(_numTokens) public onlybyOwner(){
+    function generateTokens(uint _numTokens) public onlybyOwner(){
         token.increaseTotalSuply(_numTokens);
     }
 

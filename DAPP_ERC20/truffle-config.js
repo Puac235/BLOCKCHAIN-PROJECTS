@@ -1,7 +1,7 @@
 require('babel-register');
 require('babel-polyfill');
 
-var HDWalletProvider = required("truffle-hdwallet-provider");
+var HDWalletProvider = require("truffle-hdwallet-provider");
 var mnemonic = "orange blue yellow " // SEED PHRASE
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
   contracts_build_directory: './src/abis/',
   compilers: {
     solc: {
-      version: "0.6.8",
+      version: "0.5.8",
       optimizer: {
         enabled: true,
         runs: 200

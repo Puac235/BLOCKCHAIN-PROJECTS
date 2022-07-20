@@ -38,8 +38,8 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts();
     this.setState({account: accounts[0]});
 
-    // const networkId = '5777';  // Ganache
-    const networkId = '4';        // Rinkeby
+    const networkId = '5777';  // Ganache
+    // const networkId = '4';        // Rinkeby
 
     console.log('networkID: ', networkId);
 
@@ -56,8 +56,8 @@ class App extends Component {
       const contract = new web3.eth.Contract(abi, address);
       this.setState({contract});
 
-      // TODO: DIRECCION DEL CONTRATO
       const smartContractAddress = await this.state.contract.methods.getContract().call();
+      console.log(smartContractAddress);
       this.setState({smartContractAddress});
       console.log("Direccion del Smart Contract ", smartContractAddress);
 
@@ -122,10 +122,13 @@ class App extends Component {
     try{
       console.log(message);
       //Incrementar el balance de tokens del smart contract
-      await this.state.contract.methods.generateTokens(numTokens).send({account: accounts[0]});
+      console.log("aaa");
+      await this.state.contract.methods.generateTokens(numTokens).send({from: this.state.account});
+      alert("Se ha realizado el aumento de tokens exitosamente!");
     }
     catch(error){
       this.setState({ errorMessage: error.message });
+      alert(error.message);
     }
     finally {
       this.setState({ loading: false });
@@ -163,7 +166,7 @@ class App extends Component {
           <ul className="navbar-nav px-3">
             <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
               <small className="text-white">
-                <span id="account">{this.state.smartContractAddress}</span>
+                <span id="account">Dirección del Smart Contract: {this.state.smartContractAddress}</span>
               </small>
             </li>
           </ul>
