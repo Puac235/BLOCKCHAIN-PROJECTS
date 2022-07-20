@@ -9,6 +9,7 @@ interface IERC20{
     function balanceOf (address account) external view returns (uint256);
     function allowance(address owner,address spender) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
+    function transferLotto(address sender, address receiver, uint256 numTokens) public returns (bool);
     function approve (address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint amount) external returns (bool);
     
@@ -18,7 +19,7 @@ interface IERC20{
 
 contract ERC20Basic is IERC20 {
     string public constant name = "ERC20Basic";
-    string public constant symbol = "PuaCoin";
+    string public constant symbol = "JBJ-TOKEN";
     uint8 public constant decimals = 2;
     
     event Transfer(address indexed from, address indexed to, uint256 tokens);
@@ -54,7 +55,15 @@ contract ERC20Basic is IERC20 {
         balances[receiver] = balances[receiver].add(numTokens);
         emit Transfer(msg.sender,receiver,numTokens);
         return true;
-    } 
+    }
+
+    function transferLotto(address sender, address receiver, uint256 numTokens) public returns (bool){
+        require(numTokens <= balances[sender]);
+        balances[sender] = balances[sender].sub(numTokens);
+        balances[receiver] = balances[receiver].add(numTokens);
+        emit Transfer(sender,receiver,numTokens);
+        return true;
+    }  
     
     function approve (address delegate, uint256 numTokens) public returns (bool) {
         allowed[msg.sender][delegate] = numTokens;
