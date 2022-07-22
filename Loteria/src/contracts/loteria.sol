@@ -49,7 +49,7 @@ contract loteria{
     }
 
     // Buy tokens to buy lottery tickets
-    function buyTokens(address _userAddress, uint _numTokens) public payable{
+    function buyTokens(uint _numTokens) public payable{
 
         // Calculate the tokens cost
         uint cost = tokenPrice(_numTokens);
@@ -68,10 +68,10 @@ contract loteria{
         require(_numTokens <= balance, "Buy a free amount of tokens pls.");
 
         // Transfer of tokens to the buyer
-        token.transfer(_userAddress, _numTokens);
+        token.transfer(msg.sender, _numTokens);
 
         // Emit buyingTokens event
-        emit buyingTokens(_numTokens, _userAddress );
+        emit buyingTokens(_numTokens, msg.sender);
 
     }
 
@@ -86,8 +86,8 @@ contract loteria{
     }
 
     // user's balance tokens
-    function myTokens(address _address) public view returns (uint) {
-        return token.balanceOf(_address);
+    function myTokens() public view returns (uint) {
+        return token.balanceOf(msg.sender);
     }
 
     // ------------------------------ LOTTERY ------------------------------------
@@ -114,7 +114,7 @@ contract loteria{
         uint totalPrice = _numTickets * ticketPrice;
 
         // Filter of tokens to pay
-        require(totalPrice <= myTokens(msg.sender), "You need to buy more tokens!");
+        require(totalPrice <= myTokens(), "You need to buy more tokens!");
         // transfer tokens to contract's owner -> jackpot
         token.transferLotto(msg.sender, owner, totalPrice);
 
@@ -172,7 +172,7 @@ contract loteria{
         // tokens number to sell
         require(_numTokens > 0, "You must sell more than 0 tokens.");
         // The user must have the tokens want to sell
-        require(_numTokens <= myTokens(msg.sender), "You don't have enought tokens to sell.");
+        require(_numTokens <= myTokens(), "You don't have enought tokens to sell.");
         // User sell the tokens
         // 1. the user return the tokens
         // 2. The lottery pay for the returned tokens in ethers
