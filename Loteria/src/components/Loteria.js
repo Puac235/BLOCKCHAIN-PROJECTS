@@ -62,24 +62,73 @@ class Loteria extends Component {
       errMessage: "",
       account: "",
       jackpotLottery: 0,
+      ticketPrice: 0,
+      tickets: [],
     };
   }
 
   // Funcion para visualizar el Jackpot de la loteria
-  jackpot = async(message) => {
-    try{
-        console.log(message);
-        const jackpotLottery = await this.state.contract.methods.jackpot().call();
-        alert(parseFloat(jackpotLottery));
-        this.setState({jackpotLottery});
+  jackpot = async (message) => {
+    try {
+      console.log(message);
+      const jackpotLottery = await this.state.contract.methods.jackpot().call();
+      this.setState({ jackpotLottery });
+    } catch (err) {
+      this.setState({ errMessage: err.message });
+    } finally {
+      this.setState({ loading: false });
     }
-    catch(err){
-        this.setState({errMessage: err.message});
+  };
+
+  // Funcion para visualizar el precio del boleto
+  ticketPrice = async (message) => {
+    try {
+      console.log(message);
+      const ticketPrice = await this.state.contract.methods
+        .ticketPrice()
+        .call();
+      this.setState({ ticketPrice });
+    } catch (err) {
+      this.setState({ errMessage: err.message });
+    } finally {
+      this.setState({ loading: false });
     }
-    finally{
-        this.setState({loading: false});
+  };
+
+  // Funcion para comprar un boleto de loteria
+  buyTickets = async (tickets, message) => {
+    try {
+      const web3 = window.web3;
+      console.log(message);
+      const accounts = await web3.eth.getAccounts();
+      await this.state.contract.methods
+        .buyTicket(tickets)
+        .send({ from: accounts[0] });
+      alert("Buena Suerte con su boleto 🤩🤩🤩!");
+    } catch (err) {
+      this.setState({ errMessage: err.message });
+    } finally {
+      this.setState({ loading: false });
     }
-  }
+  };
+
+  // Funcion para obtener los tickets comprados
+  myTickets = async (message) => {
+    try {
+      console.log(message);
+      const web3 = window.web3;
+      console.log(message);
+      const accounts = await web3.eth.getAccounts();
+      const tickets = await this.state.contract.methods
+        .myTickets(accounts[0])
+        .call();
+      this.setState({tickets});
+    } catch (err) {
+      this.setState({ errMessage: err.message });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
 
   // Render de la DApp
   render() {
@@ -108,7 +157,7 @@ class Loteria extends Component {
               <div className="content mr-auto ml-auto">
                 <h1>ERC20 Lottery!</h1>
 
-                <h2>Gestión y Control de Tokens de la Lotería</h2>
+                <h2>Gestión y Control de Tickets de la Lotería</h2>
 
                 <a
                   href="http://linkedin.com/in/jose-puac-gt"
@@ -120,19 +169,112 @@ class Loteria extends Component {
                   <p> </p>
                 </a>
 
-                <br/><br/>
-                <h3> <Icon circular inverted color='red' name='gift'/> Lottery Jackpot</h3>
-                <form onSubmit={(event) => {
+                <br />
+                <br />
+                <h3>
+                  {" "}
+                  <Icon circular inverted color="red" name="gift" /> Lottery
+                  Jackpot
+                </h3>
+                <form
+                  onSubmit={(event) => {
                     event.preventDefault();
                     const mensaje = "Obteniendo Jackpot en Ejecución...";
                     this.jackpot(mensaje);
-                }}>
-
-                    <input type="submit"
-                        className="bbtn btn-block btn-danger btn-sm"
-                        value="OBTENER JACKPOT" />
+                  }}
+                >
+                  <input
+                    type="submit"
+                    className="bbtn btn-block btn-danger btn-sm"
+                    value="OBTENER JACKPOT"
+                  />
                 </form>
-                <br/><br/>
+                <h4>
+                  {this.state.jackpotLottery != 0
+                    ? "JACKPOT: " + this.state.jackpotLottery
+                    : ""}
+                </h4>
+                <br />
+                <br />
+                <h3>
+                  {" "}
+                  <Icon circular inverted color="blue" name="dollar" /> Ticket
+                  Price
+                </h3>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const mensaje = "Obteniendo Ticket Price en Ejecución...";
+                    this.ticketPrice(mensaje);
+                  }}
+                >
+                  <input
+                    type="submit"
+                    className="bbtn btn-block btn-primary btn-sm"
+                    value="GET TICKET PRICE"
+                  />
+                </form>
+                <br />
+                <br />
+                <h4>
+                  {this.state.ticketPrice != 0
+                    ? "PRECIO DEL TICKET: " + this.state.ticketPrice
+                    : ""}
+                </h4>
+                <br />
+                <br />
+                <h3>
+                  {" "}
+                  <Icon circular inverted color="orange" name="ticket" />{" "}
+                  Comprar un Ticket de Loteria
+                </h3>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const numTickets = this.numTickets.value;
+                    const mensaje = "Compra de Tickets en Ejecución...";
+                    this.buyTickets(numTickets, mensaje);
+                  }}
+                >
+                  <input
+                    type="text"
+                    className="form-control mb-1"
+                    placeholder="Numero de Tickets a Comprar"
+                    ref={(input) => (this.numTickets = input)}
+                  />
+
+                  <input
+                    type="submit"
+                    className="bbtn btn-block btn-secondary btn-sm"
+                    value="COMPRAR TICKETS"
+                  />
+                </form>
+                <br />
+                <br />
+                <h3>
+                  {" "}
+                  <Icon circular inverted color="red" name="gift" /> My Tickets
+                </h3>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const mensaje = "Obteniendo mis tickets en Ejecución...";
+                    this.myTickets(mensaje);
+                  }}
+                >
+                  <input
+                    type="submit"
+                    className="bbtn btn-block btn-danger btn-sm"
+                    value="GET MY TICKETS"
+                  />
+                </form>
+                <h4>
+                  {this.state.tickets.length > 0
+                    ? "MY TICKETS: " + this.state.tickets.join(', ')
+                    : ""}
+                </h4>
+                <br />
+                <br />
               </div>
             </main>
           </div>

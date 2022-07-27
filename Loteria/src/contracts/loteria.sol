@@ -34,7 +34,7 @@ contract loteria{
 
     // establish the token price in ethers
     function tokenPrice(uint _numTokens) internal pure returns (uint) {
-        return _numTokens * (0.0045 ether);
+        return _numTokens * (0.005 ether);
     }
 
     // Generate tokens
@@ -49,7 +49,7 @@ contract loteria{
     }
 
     // Buy tokens to buy lottery tickets
-    function buyTokens(uint _numTokens) public payable{
+    function buyTokens(address userAddress, uint _numTokens) public payable{
 
         // Calculate the tokens cost
         uint cost = tokenPrice(_numTokens);
@@ -68,10 +68,10 @@ contract loteria{
         require(_numTokens <= balance, "Buy a free amount of tokens pls.");
 
         // Transfer of tokens to the buyer
-        token.transfer(msg.sender, _numTokens);
+        token.transfer(userAddress, _numTokens);
 
         // Emit buyingTokens event
-        emit buyingTokens(_numTokens, msg.sender);
+        emit buyingTokens(_numTokens, userAddress);
 
     }
 
@@ -86,14 +86,17 @@ contract loteria{
     }
 
     // user's balance tokens
-    function myTokens() public view returns (uint) {
-        return token.balanceOf(msg.sender);
+    function myTokens(address userAddress) public view returns (uint) {
+        return token.balanceOf(userAddress);
     }
 
     // ------------------------------ LOTTERY ------------------------------------
 
     // Ticket price
     uint public ticketPrice = 15;
+
+    // Winner 
+    address public winnerAddr;
 
     // Relation to the user & tickets
     mapping(address => uint []) idUserTickets;
@@ -114,7 +117,7 @@ contract loteria{
         uint totalPrice = _numTickets * ticketPrice;
 
         // Filter of tokens to pay
-        require(totalPrice <= myTokens(), "You need to buy more tokens!");
+        require(totalPrice <= myTokens(msg.sender), "You need to buy more tokens!");
         // transfer tokens to contract's owner -> jackpot
         token.transferLotto(msg.sender, owner, totalPrice);
 
@@ -143,8 +146,8 @@ contract loteria{
     }
 
     // User's # of tickets view
-    function myTickets() public view returns (uint[] memory) {
-        return idUserTickets[msg.sender];
+    function myTickets(address userAddress) public view returns (uint[] memory) {
+        return idUserTickets[userAddress];
     }
 
     // TAKE A JACKPOT WINNER!
@@ -162,7 +165,7 @@ contract loteria{
         emit ticketWinner(election);
 
         // get the winner address
-        address winnerAddr =  ticketDNA[election];
+        winnerAddr =  ticketDNA[election];
         // send the jackpot to the winner
         token.transferLotto(msg.sender, winnerAddr, jackpot());
     }
@@ -172,7 +175,7 @@ contract loteria{
         // tokens number to sell
         require(_numTokens > 0, "You must sell more than 0 tokens.");
         // The user must have the tokens want to sell
-        require(_numTokens <= myTokens(), "You don't have enought tokens to sell.");
+        require(_numTokens <= myTokens(msg.sender), "You don't have enought tokens to sell.");
         // User sell the tokens
         // 1. the user return the tokens
         // 2. The lottery pay for the returned tokens in ethers

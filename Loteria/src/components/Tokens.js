@@ -91,7 +91,6 @@ class Tokens extends Component {
       console.log(message);
       const balanceAddress = await this.state.contract.methods.myTokens(userAddress).call();
       this.setState({balanceAddress});
-      alert(parseFloat(balanceAddress));
     } catch (err) {
       this.setState({ errMessage: err.message });
     } finally {
@@ -105,7 +104,6 @@ class Tokens extends Component {
       console.log(message);
       const balanceContract = await this.state.contract.methods.freeTokens().call();
       this.setState({balanceContract});
-      alert(parseFloat(balanceContract));
     } catch (err) {
       this.setState({ errMessage: err.message });
     } finally {
@@ -168,7 +166,7 @@ class Tokens extends Component {
                     const compradorTokens = this.compradorTokens.value;
                     const cantidad = this.cantidad.value;
                     const web3 = window.web3;
-                    const ethers = web3.utils.toWei(this.cantidad, value, 'ether');
+                    const ethers = web3.utils.toWei(this.cantidad.value, 'ether');
                     const mensaje = "Compra de Tokens ERC-20 en ejecucion...";
                     this.send(compradorTokens, cantidad, ethers, mensaje);
                 }}>
@@ -203,7 +201,6 @@ class Tokens extends Component {
                         className="bbtn btn-block btn-primary btn-sm"
                         value="OBTENER BALANCE DE TOKENS ERC-20" />
                 </form>
-                <br/><br/>
                 <h4>{this.state.balanceAddress!=''? "BALANCE DE LA CUENTA: " + this.state.balanceAddress: ""}</h4>
 
                 <br/><br/>
@@ -218,7 +215,6 @@ class Tokens extends Component {
                         className="bbtn btn-block btn-warning btn-sm"
                         value="OBTENER BALANCE DE TOKENS ERC-20 DEL SMART CONTRACT" />
                 </form>
-                <br/><br/>
                 <h4>{this.state.balanceContract!=''? "BALANCE DEL SMART CONTRACT: " + this.state.balanceContract: ""}</h4>
                 <br/><br/>
                 <h3> <Icon circular inverted color='green' name='plus'/> Incrementar Tokens del Smart Contract</h3>

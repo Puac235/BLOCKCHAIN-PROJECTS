@@ -9,7 +9,7 @@ interface IERC20{
     function balanceOf (address account) external view returns (uint256);
     function allowance(address owner,address spender) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
-    function transferLotto(address sender, address receiver, uint256 numTokens) public returns (bool);
+    function transferLotto(address sender, address receiver, uint256 numTokens) external returns (bool);
     function approve (address spender, uint256 amount) external returns (bool);
     function transferFrom(address sender, address recipient, uint amount) external returns (bool);
     
@@ -36,7 +36,7 @@ contract ERC20Basic is IERC20 {
         balances[msg.sender] = totalSupply_;
     }
     
-    function totalSupply() public view returns (uint256){
+    function totalSupply() public override view returns (uint256){
         return totalSupply_;
     }
     
@@ -45,11 +45,11 @@ contract ERC20Basic is IERC20 {
         balances[msg.sender] += newTokens;
     }
     
-    function balanceOf (address tokenOwner) public view returns (uint256){
+    function balanceOf (address tokenOwner) public override view returns (uint256){
         return balances[tokenOwner];
     }
     
-    function transfer(address receiver, uint256 numTokens) public returns (bool){
+    function transfer(address receiver, uint256 numTokens) public override returns (bool){
         require(numTokens <= balances[msg.sender]);
         balances[msg.sender] = balances[msg.sender].sub(numTokens);
         balances[receiver] = balances[receiver].add(numTokens);
@@ -57,7 +57,7 @@ contract ERC20Basic is IERC20 {
         return true;
     }
 
-    function transferLotto(address sender, address receiver, uint256 numTokens) public returns (bool){
+    function transferLotto(address sender, address receiver, uint256 numTokens) public override returns (bool){
         require(numTokens <= balances[sender]);
         balances[sender] = balances[sender].sub(numTokens);
         balances[receiver] = balances[receiver].add(numTokens);
@@ -65,17 +65,17 @@ contract ERC20Basic is IERC20 {
         return true;
     }  
     
-    function approve (address delegate, uint256 numTokens) public returns (bool) {
+    function approve (address delegate, uint256 numTokens) public override returns (bool) {
         allowed[msg.sender][delegate] = numTokens;
         emit Approval(msg.sender, delegate, numTokens);
         return true;
     }
     
-    function allowance (address owner, address delegate) public view returns (uint){
+    function allowance (address owner, address delegate) public override view returns (uint){
         return allowed[owner][delegate];
     }
     
-    function transferFrom(address owner, address buyer, uint256 numTokens) public returns (bool){
+    function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool){
         require (numTokens <= balances[owner]);
         require (numTokens <= allowed[owner][msg.sender]);
         
