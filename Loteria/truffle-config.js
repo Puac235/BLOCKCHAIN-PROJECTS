@@ -2,7 +2,7 @@ require('babel-register');
 require('babel-polyfill');
 
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "SEED PHRASE";
+var mnemonic = require('./seed.json').seed;
 
 module.exports = {
   networks: {
@@ -23,11 +23,19 @@ module.exports = {
     },
     // Binance Smart Chain (BSC)
     bscTestnet: {
-      provider: () => new HDWalletProvider(mnemonic, "https://data-seed-prebsc-1-s1.binance.org:8545"),
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
       network_id: 97,
       confirmations: 10,
       timeoutBlocks: 200,
-      skiDryRun: true,
+      skipDryRun: true
+    },
+    // BSC MAINNET
+    bsc: {
+      provider: () => new HDWalletProvider(mnemonic, `https://bsc-dataseed1.binance.org`),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
     },
   },
   contracts_directory: './src/contracts/',

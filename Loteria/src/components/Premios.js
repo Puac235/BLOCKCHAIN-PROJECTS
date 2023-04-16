@@ -35,7 +35,7 @@ class Premios extends Component {
     this.setState({ account: accounts[0] });
     console.log("Account: ", this.state.account);
 
-    const networkID = "5777"; // Ganache -> 5777, Rinkeby -> 4, BSC -> 97
+    const networkID = "97"; // Ganache -> 5777, Rinkeby -> 4, BSC -> 97
     console.log("network ID: ", networkID);
 
     const networkData = contratoLoteria.networks[networkID];

@@ -34,7 +34,7 @@ contract loteria{
 
     // establish the token price in ethers
     function tokenPrice(uint _numTokens) internal pure returns (uint) {
-        return _numTokens * (0.005 ether);
+        return _numTokens * (0.00015 ether);
     }
 
     // Generate tokens
@@ -93,7 +93,7 @@ contract loteria{
     // ------------------------------ LOTTERY ------------------------------------
 
     // Ticket price
-    uint public ticketPrice = 15;
+    uint public ticketPrice = 5;
 
     // Winner 
     address public winnerAddr;
